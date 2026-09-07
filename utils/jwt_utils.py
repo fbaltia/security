@@ -6,6 +6,12 @@ import jwt
 
 load_dotenv()
 
+def get_jwt_secret() -> str:
+    secret = os.getenv('JWT_SECRET')
+    if not secret:
+        raise RuntimeError('JWT_SECRET is not configured. Add it to the environment or a .env file.')
+    return secret
+
 def create_token(id: int, role: str) -> str:
     today = datetime.now(timezone.utc)
     return jwt.encode(payload={
@@ -14,10 +20,10 @@ def create_token(id: int, role: str) -> str:
         'exp': timedelta(minutes=15) + today,
         'role': role,
         'sub': str(id)
-    }, key=os.getenv('JWT_SECRET'), algorithm='HS256')
+    }, key=get_jwt_secret(), algorithm='HS256')
 
 def verify_token(token: str) -> dict:
     try:
-        return jwt.decode(token, key=os.getenv('JWT_SECRET'), algorithms=['HS256'])
+        return jwt.decode(token, key=get_jwt_secret(), algorithms=['HS256'])
     except jwt.exceptions.DecodeError as e:
         raise ValueError(e) from e

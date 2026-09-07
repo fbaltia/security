@@ -6,10 +6,9 @@ from pwdlib.hashers.argon2 import Argon2Hasher
 load_dotenv()
 
 def get_pepper() -> str:
-    pepper = os.getenv('APPLICATION_PEPPER', None)
+    pepper = os.getenv('APPLICATION_PEPPER')
     if not pepper:
-        # charger sur azure keyvault
-        pass
+        raise RuntimeError('APPLICATION_PEPPER is not configured. Add it to the .env file.')
     return pepper
 
 password_hasher = Argon2Hasher(
@@ -24,6 +23,6 @@ def hash(plain_password: str) -> str:
     pepper = get_pepper()
     return password_context.hash(plain_password + pepper)
 
-def verify_password(plain_password, hash):
+def verify_password(plain_password: str, hashed_password: str) -> bool:
     pepper = get_pepper()
-    return password_context.verify(plain_password + pepper, hash)
+    return password_context.verify(plain_password + pepper, hashed_password)
