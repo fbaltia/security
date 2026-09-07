@@ -20,11 +20,13 @@ if __name__ == "__main__":
     
     with local_session() as session:
         user = User(
-            last_name="Dupont",
-            first_name="Alice",
+            username="duh",
+            email="doh@duh.com",
+            role = "ZZZ",
             password_hash=""
         )
         user.set_password("MonMotDePasse123")
         session.add(user)
         session.commit()
     print(user.id)
+
