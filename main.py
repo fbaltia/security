@@ -5,8 +5,8 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine, select, text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
-
-from database import User, create_tables, get_session
+from database import create_tables, local_session
+from models.user import User
 from utils import jwt_utils, password_utils
 
 
@@ -14,8 +14,17 @@ load_dotenv()
 
 if __name__ == "__main__":
     db_url = os.getenv("DATABASE_URL")
-    engine = create_engine(db_url)
-    with engine.connect() as connection:
-        result = connection.execute(text("SELECT * from User"))
-        print(result.fetchall())
-        
+    
+    create_tables()
+
+    
+    with local_session() as session:
+        user = User(
+            last_name="Dupont",
+            first_name="Alice",
+            password_hash=""
+        )
+        user.set_password("MonMotDePasse123")
+        session.add(user)
+        session.commit()
+    print(user.id)
